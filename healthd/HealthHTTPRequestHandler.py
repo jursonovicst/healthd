@@ -22,21 +22,24 @@ class HealthHTTPRequestHandler(BaseHTTPRequestHandler):
 
                 if 'loadavg_1' in parameters:
                     kpi = loadavg_1 < float(parameters['loadavg_1'][0])
-                    response += f"loadavg_1: {loadavg_1} < {float(parameters['loadavg_1'][0])}: {'OK' if kpi else 'CRIT'}\r\n"
+                    if self.server.args.return_kpis:
+                        response += f"\r\nloadavg_1: {loadavg_1} < {float(parameters['loadavg_1'][0])}: {'OK' if kpi else 'CRIT'}"
                     logging.debug(response.strip())
                     if not kpi:
                         healthy = False
 
                 if 'loadavg_5' in parameters:
                     kpi = loadavg_5 < float(parameters['loadavg_5'][0])
-                    response += f"loadavg_5: {loadavg_5} < {float(parameters['loadavg_5'][0])}: {'OK' if kpi else 'CRIT'}\r\n"
+                    if self.server.args.return_kpis:
+                        response += f"\r\nloadavg_5: {loadavg_5} < {float(parameters['loadavg_5'][0])}: {'OK' if kpi else 'CRIT'}"
                     logging.debug(response.strip())
                     if not kpi:
                         healthy = False
 
                 if 'loadavg_15' in parameters:
                     kpi = loadavg_15 < float(parameters['loadavg_15'][0])
-                    response += f"loadavg_15: {loadavg_15} < {float(parameters['loadavg_15'][0])}: {'OK' if kpi else 'CRIT'}\r\n"
+                    if self.server.args.return_kpis:
+                        response += f"\r\nloadavg_15: {loadavg_15} < {float(parameters['loadavg_15'][0])}: {'OK' if kpi else 'CRIT'}"
                     logging.debug(response.strip())
                     if not kpi:
                         healthy = False
@@ -47,7 +50,8 @@ class HealthHTTPRequestHandler(BaseHTTPRequestHandler):
 
                 if 'cpu_idle' in parameters:
                     kpi = scputimes.idle > float(parameters['cpu_idle'][0])
-                    response += f"cpu_idle: {scputimes.idle} > {float(parameters['cpu_idle'][0])}: {'OK' if kpi else 'CRIT'}\r\n"
+                    if self.server.args.return_kpis:
+                        response += f"\r\ncpu_idle: {scputimes.idle} > {float(parameters['cpu_idle'][0])}: {'OK' if kpi else 'CRIT'}"
                     logging.debug(response.strip())
                     if not kpi:
                         healthy = False
@@ -58,7 +62,8 @@ class HealthHTTPRequestHandler(BaseHTTPRequestHandler):
 
                 if 'mem_free' in parameters:
                     kpi = mem.free > float(parameters['mem_free'][0])
-                    response += f"mem_free: {mem.free} > {float(parameters['mem_free'][0])}: {'OK' if kpi else 'CRIT'}\r\n"
+                    if self.server.args.return_kpis:
+                        response += f"\r\nmem_free: {mem.free} > {float(parameters['mem_free'][0])}: {'OK' if kpi else 'CRIT'}"
                     logging.debug(response.strip())
                     if not kpi:
                         healthy = False
@@ -70,7 +75,8 @@ class HealthHTTPRequestHandler(BaseHTTPRequestHandler):
                 if parameters['iface'][0] in snetio:
                     if 'txthroughput' in parameters:
                         kpi = snetio[parameters['iface'][0]].bytes_sent < float(parameters['txthroughput'][0])
-                        response += f"tx_{parameters['iface'][0]}: {snetio[parameters['iface'][0]].bytes_sent} < {float(parameters['txthroughput'][0])}: {'OK' if kpi else 'CRIT'}\r\n"
+                        if self.server.args.return_kpis:
+                            response += f"\r\ntx_{parameters['iface'][0]}: {snetio[parameters['iface'][0]].bytes_sent} < {float(parameters['txthroughput'][0])}: {'OK' if kpi else 'CRIT'}"
                         logging.debug(response.strip())
                         if not kpi:
                             healthy = False
@@ -92,7 +98,7 @@ class HealthHTTPRequestHandler(BaseHTTPRequestHandler):
             self.wfile.write(str(err).encode('ascii'))
 
         else:
-            body = f"{'webisonline' if healthy else 'critical'}\r\n{response}"
+            body = f"{self.server.args.ok_string if healthy else 'critical'}{response}"
 
             self.send_response(200)
             self.send_header('Content-type', 'text/html')
