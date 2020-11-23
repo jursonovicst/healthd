@@ -1,0 +1,10 @@
+[Unit]
+Description=Healthd service
+
+[Service]
+User=healthd
+Group=healthd
+ExecStart=/usr/bin/python3 /opt/healthd/healthd.py {{ healthd_socket_path }}
+
+[Install]
+WantedBy=multi-user.target
