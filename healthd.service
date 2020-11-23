@@ -1,10 +1,17 @@
 [Unit]
 Description=Healthd service
 
+
 [Service]
+Environment=SOCKET_PATH=/tmp/healthd.sock
+
 User=healthd
 Group=healthd
-ExecStart=/usr/bin/python3 /opt/healthd/healthd.py {{ healthd_socket_path }}
+
+ExecStartPre=/bin/rm -f ${SOCKET_PATH}
+ExecStart=/usr/bin/python3 /opt/healthd/healthd.py ${SOCKET_PATH}
+Restart=always
+
 
 [Install]
 WantedBy=multi-user.target
