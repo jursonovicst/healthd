@@ -2,6 +2,7 @@ import socket
 from http.server import HTTPServer
 from socketserver import TCPServer
 from socketserver import ThreadingMixIn
+import os
 
 
 class UnixHTTPServer(ThreadingMixIn, HTTPServer):
@@ -9,5 +10,9 @@ class UnixHTTPServer(ThreadingMixIn, HTTPServer):
 
     def server_bind(self):
         TCPServer.server_bind(self)
-        self.server_name = "foo"
+
+        # change socket permissions
+        os.chmod(self.server_address, 0o0770)
+
+        self.server_name = "healthd"
         self.server_port = 0
