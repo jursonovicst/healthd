@@ -14,7 +14,7 @@ def mode_type(x):
 
 parser = argparse.ArgumentParser('healthd', description='Provides a resource check daemon over a unix domain socket.')
 parser.add_argument('socket', type=str, help='Unix domain socket path to listen on.')
-#parser.add_argument('--file-mode', type=mode_type, default=0o660,
+# parser.add_argument('--file-mode', type=mode_type, default=0o660,
 #                    help='File permissions to open socket with (default 660)') TODO: fix this
 parser.add_argument('--log-file', type=str, default='-',
                     help='File path to write logs to. Use - for stdout. (default: %(default)s')
@@ -22,7 +22,14 @@ levels = ('DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL')
 parser.add_argument('--log-level', type=str, default='WARNING', choices=levels,
                     help='Logging severity. (default: %(default)s')
 parser.add_argument('--ok-string', type=str, default='webisonline',
-                    help='String to return in case of all KPIs are healthy. (default: %(default)s')
+                    help='String to return if all KPIs are healthy. (default: %(default)s')
+parser.add_argument('--fail-string', type=str, default='critical',
+                    help='String to return if at least one KPI is unhealthy. (default: %(default)s')
+parser.add_argument('--ok-status-code', type=int, default=200,
+                    help='HTTP status code to return if all KPIs are healthy. (default: %(default)s')
+parser.add_argument('--fail-status-code', type=int, default=503,
+                    help='HTTP status codes to return if at least one KPI is unhealthy. (default: %(default)s')
+
 parser.add_argument('--return-kpis', type=bool, default=False,
                     help='Return the detailed KPIs in the HTTP response. (default: %(default)s')
 

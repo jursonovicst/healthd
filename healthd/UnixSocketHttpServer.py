@@ -8,6 +8,10 @@ from socketserver import ThreadingMixIn
 class UnixHTTPServer(ThreadingMixIn, HTTPServer):
     address_family = socket.AF_UNIX
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.args = None
+
     def server_bind(self):
         TCPServer.server_bind(self)
 

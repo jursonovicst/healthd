@@ -98,9 +98,9 @@ class HealthHTTPRequestHandler(BaseHTTPRequestHandler):
             self.wfile.write(str(err).encode('ascii'))
 
         else:
-            body = f"{self.server.args.ok_string if healthy else 'critical'}{response}"
+            body = f"{self.server.args.ok_string if healthy else self.server.args.fail_string}{response}"
 
-            self.send_response(200)
+            self.send_response(self.server.args.ok_status_code if healthy else self.server.args.fail_status_code)
             self.send_header('Content-type', 'text/html')
             self.send_header('Content-Length', f"{int(len(body))}")
             self.end_headers()
