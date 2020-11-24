@@ -45,7 +45,7 @@ class HealthHTTPRequestHandler(BaseHTTPRequestHandler):
                         healthy = False
 
             if 'cpu_idle' in parameters:
-                scputimes = psutil.cpu_times_percent(interval=5)
+                scputimes = psutil.cpu_times_percent(interval=1)
                 logging.debug(f"cpu: {scputimes}")
 
                 if 'cpu_idle' in parameters:

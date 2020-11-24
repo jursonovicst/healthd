@@ -16,7 +16,7 @@ class UnixHTTPServer(ThreadingMixIn, HTTPServer):
         TCPServer.server_bind(self)
 
         # change socket permissions
-        os.chmod(self.server_address, 0o0660)
+        os.chmod(self.server_address, 0o0660)   #TODO: fix mode parsing from arguments
 
         self.server_name = "healthd"
         self.server_port = 0
