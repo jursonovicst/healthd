@@ -68,22 +68,18 @@ class HealthHTTPRequestHandler(BaseHTTPRequestHandler):
                     if not kpi:
                         healthy = False
 
-            if 'iface' in parameters and ('txthroughput' in parameters):
-                snetio = psutil.net_io_counters(pernic=True)
-                logging.debug(f"iface: {snetio}")
+            if 'iface' in parameters and ('tx' in parameters):
+                bytes_sent_pro_sec = self.server.instat.get(parameters['iface'][0], 'bytes_sent')
 
-                if parameters['iface'][0] in snetio:
-                    if 'txthroughput' in parameters:
-                        kpi = snetio[parameters['iface'][0]].bytes_sent < float(parameters['txthroughput'][0])
-                        if self.server.args.return_kpis:
-                            response += f"\r\ntx_{parameters['iface'][0]}: {snetio[parameters['iface'][0]].bytes_sent} < {float(parameters['txthroughput'][0])}: {'OK' if kpi else 'CRIT'}"
-                        logging.debug(response.strip())
-                        if not kpi:
-                            healthy = False
-                else:
-                    raise ValueError(f"No interface '{parameters['iface'][0]}'")
+                kpi = bytes_sent_pro_sec * 8 < float(parameters['tx'][0])
+                if self.server.args.return_kpis:
+                    response += f"\r\ntx_{parameters['iface'][0]}: {bytes_sent_pro_sec * 8} < {float(parameters['tx'][0])}: {'OK' if kpi else 'CRIT'}"
+                logging.debug(response.strip())
+                if not kpi:
+                    healthy = False
 
         except ValueError as err:
+            logging.warning(err)
             self.send_response(400)
             self.send_header('Content-type', 'text/html')
             self.send_header('Content-Length', f"{int(len(str(err)))}")
@@ -91,11 +87,21 @@ class HealthHTTPRequestHandler(BaseHTTPRequestHandler):
             self.wfile.write(str(err).encode('ascii'))
 
         except FileNotFoundError as err:
+            logging.warning(err)
             self.send_response(404)
             self.send_header('Content-type', 'text/html')
             self.send_header('Content-Length', f"{int(len(str(err)))}")
             self.end_headers()
             self.wfile.write(str(err).encode('ascii'))
+
+        except Exception as e:
+            logging.warning(e)
+            self.send_response(500)
+            self.send_header('Content-type', 'text/html')
+            self.send_header('Content-Length', f"{int(len(str(e)))}")
+            self.end_headers()
+            self.wfile.write(str(e).encode('ascii'))
+
 
         else:
             body = f"{self.server.args.ok_string if healthy else self.server.args.fail_string}{response}"

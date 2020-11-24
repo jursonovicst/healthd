@@ -14,7 +14,7 @@ The request <path> is ignored. The query string is parsed, and searched for the 
 | loadavg_15    | system load 15 minute average | - | kpi < limit |
 | cpu_idle      | CPU in IDLE state (over 1 second) | percent | kpi > limit |
 | mem_free      | free memory                   | byte | kpi > limit |
-| iface, txthroughput | interface name, interface transmit throughput | string, bps | kpi[iface] < limit
+| iface, tx     | interface name, interface transmit throughput | string, bps | kpi[iface] < limit
 
 KPI expressions evaluations are combined with AND relation. If the results is true, the --ok-string is returned. The 
 individual KPIs can also be returned with the --return-kpis argument.

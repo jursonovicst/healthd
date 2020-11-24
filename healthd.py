@@ -1,8 +1,9 @@
 import argparse
 import logging
 import os
+from threading import Event
 
-from healthd import UnixHTTPServer, HealthHTTPRequestHandler
+from healthd import UnixHTTPServer, HealthHTTPRequestHandler, IFStat
 
 
 def mode_type(x):
@@ -42,6 +43,10 @@ if __name__ == "__main__":
     try:
         logging.info(f"Starting daemon on {args.socket}.")
 
+        stop_event = Event()
+        instat = IFStat(stop_event)
+        instat.start()
+
         # Make sure the socket does not exist
         if os.path.exists(args.socket):
             raise FileExistsError(f"Socket {args.socket} already exists!")
@@ -50,6 +55,7 @@ if __name__ == "__main__":
         with UnixHTTPServer(args.socket, HealthHTTPRequestHandler) as server:
             # pass over arguments
             server.args = args
+            server.instat = instat
 
             # Activate the server; this will keep running until you interrupt the program with Ctrl-C
             server.serve_forever()
@@ -60,5 +66,7 @@ if __name__ == "__main__":
         logging.error(e)
         exit(-1)
     finally:
+        stop_event.set()
+        instat.join(1)
         os.unlink(args.socket)
         logging.info("Exited.")
