@@ -1,11 +1,40 @@
 # healthd
 Checks system KPIs over HTTP listening on a UNIX domain socket
 
+
+# Installation
+
+clone repository
+
+```
+https://github.com/jursonovicst/healthd.git
+```
+
+check python3
+
+```
+python3 --version
+pip3 --version
+```
+
+install python dependencies
+
+```
+pip3 install -r requirements.txt
+```
+
+deploy as a unix service: copy ```heathd.service``` under /etc/systemd/system and start the service with ```systemct start healthd```
+
+
 # HTTP api
 
-http:///<path>?<kpi_name>=<kpi_limit>&<kpi_name>=<kpi_limit>...
+The daemon can be accessed via HTTP over a unix domain socket:
 
-The request <path> is ignored. The query string is parsed, and searched for the supported <kpi_name> and <kpi_limit>:
+```
+http:///<path>?<kpi_name>=<kpi_limit>&<kpi_name>=<kpi_limit>...
+```
+
+The request ```<path>``` is ignored. The query string is parsed, and searched for the supported ```<kpi_name>``` and ```<kpi_limit>```:
 
 | kpi_name      | Description   | unit  | expression |
 | ------------- |:------------- | ---------------:| -----------:|
