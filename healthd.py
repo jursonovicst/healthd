@@ -31,7 +31,7 @@ parser.add_argument('--ok-status-code', type=int, default=200,
 parser.add_argument('--fail-status-code', type=int, default=503,
                     help='HTTP status codes to return if at least one KPI is unhealthy. (default: %(default)s')
 
-parser.add_argument('--return-kpis', type=bool, default=False,
+parser.add_argument('--return-kpis', dest='return_kpis', action='store_true',
                     help='Return the detailed KPIs in the HTTP response. (default: %(default)s')
 
 args = parser.parse_args()
